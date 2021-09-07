@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 import pygame
 
-from util.geometry import Vec2
+from bot_base.util.geometry import Vec2
 
 pygame.font.init()
 

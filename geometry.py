@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Union
 
-import util.colors as colors
-from util.serialization import Serializable
+import bot_base.util.colors as colors
+from bot_base.util.serialization import Serializable
 
 @dataclass
 class Vec2:
