@@ -113,6 +113,18 @@ class Rect(Serializable):
     def to_bbox(self) -> tuple:
         return (self.x, self.y, self.width + self.x, self.height + self.y)
 
+    def top_left(self) -> Vec2:
+        return Vec2(self.x, self.y)
+
+    def top_right(self) -> Vec2:
+        return Vec2(self.x + self.width, self.y)
+
+    def bottom_left(self) -> Vec2:
+        return Vec2(self.x, self.y + self.height)
+
+    def bottom_right(self) -> Vec2:
+        return Vec2(self.x + self.width, self.y + self.height)
+
     @classmethod
     def from_bbox(self, bbox: tuple):
         return Rect(bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1])
