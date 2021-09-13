@@ -78,7 +78,11 @@ class Rect(Serializable):
     visible: bool = True
 
     def __post_init__(self):
-        self.assert_fields()
+        try:
+            self.assert_fields()
+        except AssertionError as e:
+            print(f'Rectangle: {self.x}, {self.y}, {self.width}, {self.height}, color={self.color}, filled={self.filled}, relative={self.relative}, visible={self.visible}')
+            raise e
 
     def assert_fields(self):
         assert isinstance(self.color, tuple), "Color must be a tuple"
@@ -92,8 +96,8 @@ class Rect(Serializable):
         assert isinstance(self.height, int), "height must be an integer"
         assert self.width >= 0, "width must be >= 0"
         assert self.height >= 0, "height must be >= 0"
-        assert self.x >= 0, "x must be >= 0"
-        assert self.y >= 0, "y must be >= 0"
+        # assert self.x >= 0, "x must be >= 0"
+        # assert self.y >= 0, "y must be >= 0"
 
     def center(self) -> Vec2:
         return Vec2(self.x + self.width // 2, self.y + self.height // 2)
