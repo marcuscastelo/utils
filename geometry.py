@@ -15,25 +15,31 @@ class Vec2:
     def norm(self):
         return (self.x ** 2 + self.y ** 2) ** 0.5
 
-    def __add__(self, other):
+    def proj_x(self):
+        return Vec2(self.x, 0)
+    
+    def proj_y(self):
+        return Vec2(0, self.y)
+
+    def __add__(self, other: 'Vec2') -> 'Vec2':
         return Vec2(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other):
+    def __sub__(self, other: 'Vec2') -> 'Vec2':
         return Vec2(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, other):
+    def __mul__(self, other: int) -> 'Vec2':
         return Vec2(self.x * other, self.y * other)
 
-    def __truediv__(self, other):
+    def __truediv__(self, other: int) -> 'Vec2':
         return Vec2(self.x / other, self.y / other)
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other : int) -> 'Vec2':
         return Vec2(self.x // other, self.y // other)
 
-    def __mod__(self, other):
+    def __mod__(self, other) -> 'Vec2':
         return Vec2(self.x % other, self.y % other)
 
-    def __neg__(self):
+    def __neg__(self) -> 'Vec2':
         return Vec2(-self.x, -self.y)
 
     def __ne__(self, o: object) -> bool:
