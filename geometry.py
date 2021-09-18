@@ -197,6 +197,9 @@ class Rect(Serializable):
     def expandRight(self, amount: int):
         return Rect(self.x, self.y, self.width + amount, self.height, self.color, self.filled, self.relative, self.visible)
 
+    def expandCenter(self, amount: int):
+        return Rect(self.x - amount, self.y - amount, self.width + amount * 2, self.height + amount * 2, self.color, self.filled)
+
     def moveRel(self, movementVec: Vec2):
         return Rect(self.x + movementVec.x, self.y + movementVec.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
 
