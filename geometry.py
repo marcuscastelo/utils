@@ -80,28 +80,27 @@ class Rect(Serializable):
     height: int
     color: tuple = colors.pink # BGRA
     filled: bool = False
-    relative: bool = False
     visible: bool = True
 
     def __post_init__(self):
+        self.x, self.y, self.width, self.height = map(int, [self.x, self.y, self.width, self.height])
         try:
             self.assert_fields()
         except AssertionError as e:
-            print(f'Rectangle: {self.x}, {self.y}, {self.width}, {self.height}, color={self.color}, filled={self.filled}, relative={self.relative}, visible={self.visible}')
+            print(f'Rectangle: {self.x}, {self.y}, {self.width}, {self.height}, color={self.color}, filled={self.filled}, visible={self.visible}')
             raise e
 
     def assert_fields(self):
         assert isinstance(self.color, tuple), "Color must be a tuple"
         assert len(self.color) == 3, "Color must be a 3-tuple"
         assert isinstance(self.filled, bool), "Filled must be a boolean"
-        assert isinstance(self.relative, bool), "Relative must be a boolean"
         assert isinstance(self.visible, bool), "Visible must be a boolean"
         assert isinstance(self.x, int), "x must be an integer"
         assert isinstance(self.y, int), "y must be an integer"
         assert isinstance(self.width, int), "width must be an integer"
         assert isinstance(self.height, int), "height must be an integer"
-        assert self.width >= 0, "width must be >= 0"
-        assert self.height >= 0, "height must be >= 0"
+        assert self.width >= 0, "width must be >= 0, but was " + str(self.width)
+        assert self.height >= 0, "height must be >= 0, but was " + str(self.height)
         # assert self.x >= 0, "x must be >= 0"
         # assert self.y >= 0, "y must be >= 0"
 
@@ -143,13 +142,13 @@ class Rect(Serializable):
         return self.x, self.y, self.width, self.height, self.color, self.filled
 
     def __repr__(self):
-        return f'Rect(x={self.x}, y={self.y}, width={self.width}, height={self.height}, color={self.color}, filled={self.filled}, relative={self.relative}, visible={self.visible})'
+        return f'Rect(x={self.x}, y={self.y}, width={self.width}, height={self.height}, color={self.color}, filled={self.filled}, visible={self.visible})'
 
     def __iter__(self):
-        yield from (self.x, self.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        yield from (self.x, self.y, self.width, self.height, self.color, self.filled, self.visible)
 
     def __getitem__(self, item):
-        return (self.x, self.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)[item]
+        return (self.x, self.y, self.width, self.height, self.color, self.filled, self.visible)[item]
 
     def __setitem__(self, key, value):
         if key == 0:
@@ -179,44 +178,44 @@ class Rect(Serializable):
 
     def expand(self, amount: Union[int, Vec2]):
         if isinstance(amount, int):
-            return Rect(self.x - amount, self.y - amount, self.width + amount * 2, self.height + amount * 2, self.color, self.filled, self.relative, self.visible)
+            return Rect(self.x - amount, self.y - amount, self.width + amount * 2, self.height + amount * 2, self.color, self.filled, self.visible)
         elif isinstance(amount, Vec2):
-            return Rect(self.x - amount.x, self.y - amount.y, self.width + amount.x * 2, self.height + amount.y * 2, self.color, self.filled, self.relative, self.visible)
+            return Rect(self.x - amount.x, self.y - amount.y, self.width + amount.x * 2, self.height + amount.y * 2, self.color, self.filled, self.visible)
         else:
             raise TypeError(f'Expected int or Vec2, got {type(amount)}')
 
     def expandUp(self, amount: int):
-        return Rect(self.x, self.y - amount, self.width, self.height + amount, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y - amount, self.width, self.height + amount, self.color, self.filled, self.visible)
     
     def expandDown(self, amount: int):
-        return Rect(self.x, self.y, self.width, self.height + amount, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y, self.width, self.height + amount, self.color, self.filled, self.visible)
 
     def expandLeft(self, amount: int):
-        return Rect(self.x - amount, self.y, self.width + amount, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x - amount, self.y, self.width + amount, self.height, self.color, self.filled, self.visible)
 
     def expandRight(self, amount: int):
-        return Rect(self.x, self.y, self.width + amount, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y, self.width + amount, self.height, self.color, self.filled, self.visible)
 
     def expandCenter(self, amount: int):
         return Rect(self.x - amount, self.y - amount, self.width + amount * 2, self.height + amount * 2, self.color, self.filled)
 
     def moveRel(self, movementVec: Vec2):
-        return Rect(self.x + movementVec.x, self.y + movementVec.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x + movementVec.x, self.y + movementVec.y, self.width, self.height, self.color, self.filled, self.visible)
 
     def moveRelX(self, amount: int):
-        return Rect(self.x + amount, self.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x + amount, self.y, self.width, self.height, self.color, self.filled, self.visible)
 
     def moveRelY(self, amount: int):
-        return Rect(self.x, self.y + amount, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y + amount, self.width, self.height, self.color, self.filled, self.visible)
 
     def moveAbs(self, newPivot: Vec2):
-        return Rect(newPivot.x, newPivot.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(newPivot.x, newPivot.y, self.width, self.height, self.color, self.filled, self.visible)
 
     def copy(self):
-        return Rect(self.x, self.y, self.width, self.height, self.color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y, self.width, self.height, self.color, self.filled, self.visible)
 
     def colored(self, color: tuple):
-        return Rect(self.x, self.y, self.width, self.height, color, self.filled, self.relative, self.visible)
+        return Rect(self.x, self.y, self.width, self.height, color, self.filled, self.visible)
 
     def slice_frame(self, frame):
         sx, sy, w, h = self.x, self.y, self.width, self.height
