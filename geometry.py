@@ -21,6 +21,12 @@ class Vec2:
     def proj_y(self):
         return Vec2(0, self.y)
 
+    def with_x(self, x):
+        return Vec2(x, self.y)
+
+    def with_y(self, y):
+        return Vec2(self.x, y)
+
     def __add__(self, other: 'Vec2') -> 'Vec2':
         return Vec2(self.x + other.x, self.y + other.y)
 
@@ -133,6 +139,12 @@ class Rect(Serializable):
 
     def bottom_right(self) -> Vec2:
         return Vec2(self.x + self.width, self.y + self.height)
+
+    def with_x(self, x: int) -> 'Rect':
+        return Rect(x, self.y, self.width, self.height)
+
+    def with_y(self, y: int) -> 'Rect':
+        return Rect(self.x, y, self.width, self.height)
 
     @classmethod
     def from_bbox(self, bbox: tuple):
