@@ -7,7 +7,6 @@ keyboardPressed = False
 
 def on_press(key):
     global keyboardPressed
-    print('[USER INPUT] Keyboard is in use: ', key)
     keyboardPressed = True
 keyboard.on_press(on_press)
 
