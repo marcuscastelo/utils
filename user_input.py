@@ -10,7 +10,7 @@ def on_press(key):
     keyboardPressed = True
 keyboard.on_press(on_press)
 
-def is_user_currently_using_keyboar_or_mouse():
+def is_user_currently_using_keyboard_or_mouse():
     """
     Returns True if the user is currently using the keyboard or mouse.
     """
