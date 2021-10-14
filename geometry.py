@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Union
 
 import bot_base.util.colors as colors
 from bot_base.util.serialization import Serializable
