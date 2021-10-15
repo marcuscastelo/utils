@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Tuple
 
 import bot_base.util.colors as colors
 from bot_base.util.serialization import Serializable
@@ -141,6 +142,9 @@ class Rect(Serializable):
     
     def to_bbox(self) -> tuple:
         return (self.x, self.y, self.width + self.x, self.height + self.y)
+
+    def to_double_point(self) -> Tuple[Vec2]:
+        return (self.top_left(), self.bottom_right())
 
     def top_left(self) -> Vec2:
         return Vec2(self.x, self.y)
