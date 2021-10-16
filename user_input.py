@@ -1,36 +1,39 @@
 import keyboard
-import mouse
 import pyautogui
 import time
+import pynput.mouse as pmouse
 
-keyboardPressed = False
-
+DELTA_KB = 0.2
+userInputLastTime = 0
 def on_press(key):
-    global keyboardPressed
-    keyboardPressed = True
+    print('{0} pressed'.format(key))
+    global userInputLastTime
+    userInputLastTime = time.time()
+
+# Adds listener to the keyboard 
 keyboard.on_press(on_press)
+def on_mouse_move(x, y):
+    global userInputLastTime
+    userInputLastTime = time.time()
+
+def on_click(x, y, button, pressed):
+    global userInputLastTime
+    userInputLastTime = time.time()
+
+def on_scroll(x, y, dx, dy):
+    global userInputLastTime
+    userInputLastTime = time.time()
+
+# Adds listener to the mouse
+listener = pmouse.Listener(
+        on_move=on_mouse_move,
+        on_click=on_click,
+        on_scroll=on_scroll)
+listener.start()
 
 def is_user_currently_using_keyboard_or_mouse():
     """
     Returns True if the user is currently using the keyboard or mouse.
     """
-    global keyboardPressed
-    keyboardPressedAtStart = keyboardPressed
-    keyboardPressed = False
-
-    mousePosBefore = pyautogui.position()
-    time.sleep(0.05)
-    mousePosAfter = pyautogui.position()
-
-    mouseMoved = (
-        mousePosBefore != mousePosAfter
-        or
-        mouse.is_pressed('left')
-        or
-        mouse.is_pressed('right')
-    )
-
-    keyboardPressedAtEnd = keyboardPressed
-    keyboardPressed = False
-    
-    return keyboardPressedAtStart or keyboardPressedAtEnd or mouseMoved
+    global userInputLastTime
+    return (time.time() - userInputLastTime) < DELTA_KB
