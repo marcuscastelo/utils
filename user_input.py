@@ -5,7 +5,6 @@ import pynput.mouse as pmouse
 DELTA_KB = 0.2
 userInputLastTime = 0
 def on_press(key):
-    print('{0} pressed'.format(key))
     global userInputLastTime
     userInputLastTime = time.time()
 
