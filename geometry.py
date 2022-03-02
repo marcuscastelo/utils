@@ -252,8 +252,8 @@ class Rect(Serializable):
         return self.x == o.x and self.y == o.y and self.width == o.width and self.height == o.height
 
     @classmethod
-    def from_bbox(self, bbox: tuple):
-        return Rect(bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1])
+    def from_bbox(cls, bbox: tuple):
+        return cls(bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1])
 
     def cut_image(self, img: np.ndarray) -> np.ndarray:
         sx, sy, w, h = self.x, self.y, self.width, self.height
