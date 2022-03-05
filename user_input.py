@@ -1,4 +1,4 @@
-import keyboard
+import keyboard # py.typed
 import time
 import pynput.mouse as pmouse
 

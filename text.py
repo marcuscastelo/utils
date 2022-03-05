@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any
 import pygame
 
-from bot_base.util.geometry import Vec2
+from bot_base.util.geometry import Vec2Int
 
 pygame.font.init()
 
@@ -19,7 +19,7 @@ def get_font(fontName = "Arial", size = 20, bold = False, italic = False):
 @dataclass
 class Text:
     text: str
-    pos: Vec2
+    pos: Vec2Int
     font: Any
     color: tuple
     centered: bool = False

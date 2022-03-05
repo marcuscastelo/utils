@@ -9,7 +9,7 @@ from copy import copy
 import numpy as np
 
 @dataclass
-class Vec2:
+class Vec2Int:
     x: int
     y: int
 
@@ -20,42 +20,46 @@ class Vec2:
         return (self.x ** 2 + self.y ** 2) ** 0.5
 
     def proj_x(self):
-        return Vec2(self.x, 0)
+        return Vec2Int(self.x, 0)
     
     def proj_y(self):
-        return Vec2(0, self.y)
+        return Vec2Int(0, self.y)
 
     def with_x(self, x):
-        return Vec2(x, self.y)
+        return Vec2Int(x, self.y)
 
     def with_y(self, y):
-        return Vec2(self.x, y)
+        return Vec2Int(self.x, y)
 
-    def __add__(self, other: 'Vec2') -> 'Vec2':
-        return Vec2(self.x + other.x, self.y + other.y)
+    def __add__(self, other: 'Vec2Int') -> 'Vec2Int':
+        return Vec2Int(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other: 'Vec2') -> 'Vec2':
-        return Vec2(self.x - other.x, self.y - other.y)
+    def __sub__(self, other: 'Vec2Int') -> 'Vec2Int':
+        return Vec2Int(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, other: int) -> 'Vec2':
-        return Vec2(self.x * other, self.y * other)
+    def __mul__(self, other: int) -> 'Vec2Int':
+        return Vec2Int(self.x * other, self.y * other)
 
-    def __truediv__(self, other: int) -> 'Vec2':
-        return Vec2(self.x / other, self.y / other)
+    def __truediv__(self, other: int) -> 'Vec2Int':
+        return Vec2Int(self.x // other, self.y // other)
 
-    def __floordiv__(self, other : int) -> 'Vec2':
-        return Vec2(self.x // other, self.y // other)
+    def __floordiv__(self, other : int) -> 'Vec2Int':
+        return Vec2Int(self.x // other, self.y // other)
 
-    def __mod__(self, other) -> 'Vec2':
-        return Vec2(self.x % other, self.y % other)
+    def __mod__(self, other) -> 'Vec2Int':
+        return Vec2Int(self.x % other, self.y % other)
 
-    def __neg__(self) -> 'Vec2':
-        return Vec2(-self.x, -self.y)
+    def __neg__(self) -> 'Vec2Int':
+        return Vec2Int(-self.x, -self.y)
 
     def __ne__(self, o: object) -> bool:
+        if not isinstance(o, Vec2Int):
+            return True
         return self.x != o.x or self.y != o.y
     
     def __eq__(self, o: object) -> bool:
+        if not isinstance(o, Vec2Int):
+            return False
         return self.x == o.x and self.y == o.y
 
     def __hash__(self):
@@ -117,58 +121,58 @@ class Rect(Serializable):
         else:
             raise IndexError
 
-    def __add__(self, vec: 'Vec2') -> 'Rect':
-        assert isinstance(vec, Vec2)
+    def __add__(self, vec: 'Vec2Int') -> 'Rect':
+        assert isinstance(vec, Vec2Int)
         newRect = copy(self)
         newRect.x += vec.x
         newRect.y += vec.y
         return newRect
 
-    def __sub__(self, vec: 'Vec2') -> 'Rect':
-        assert isinstance(vec, Vec2)
+    def __sub__(self, vec: 'Vec2Int') -> 'Rect':
+        assert isinstance(vec, Vec2Int)
         newRect = copy(self)
         newRect.x -= vec.x
         newRect.y -= vec.y
         return newRect
 
-    def center(self) -> 'Vec2':
-        return Vec2(self.x + self.width // 2, self.y + self.height // 2)
+    def center(self) -> 'Vec2Int':
+        return Vec2Int(self.x + self.width // 2, self.y + self.height // 2)
 
-    def pivot(self) -> 'Vec2':
-        return Vec2(self.x, self.y)
+    def pivot(self) -> 'Vec2Int':
+        return Vec2Int(self.x, self.y)
 
-    def size(self) -> 'Vec2':
-        return Vec2(self.width, self.height)
+    def size(self) -> 'Vec2Int':
+        return Vec2Int(self.width, self.height)
     
     def to_bbox(self) -> tuple:
         return (self.x, self.y, self.width + self.x, self.height + self.y)
 
-    def to_double_point(self) -> Tuple[Vec2]:
+    def to_double_point(self) -> Tuple[Vec2Int, Vec2Int]:
         return (self.top_left(), self.bottom_right())
 
-    def top_left(self) -> Vec2:
-        return Vec2(self.x, self.y)
+    def top_left(self) -> Vec2Int:
+        return Vec2Int(self.x, self.y)
 
-    def top_right(self) -> Vec2:
-        return Vec2(self.x + self.width, self.y)
+    def top_right(self) -> Vec2Int:
+        return Vec2Int(self.x + self.width, self.y)
 
-    def bottom_left(self) -> Vec2:
-        return Vec2(self.x, self.y + self.height)
+    def bottom_left(self) -> Vec2Int:
+        return Vec2Int(self.x, self.y + self.height)
 
-    def bottom_right(self) -> Vec2:
-        return Vec2(self.x + self.width, self.y + self.height)
+    def bottom_right(self) -> Vec2Int:
+        return Vec2Int(self.x + self.width, self.y + self.height)
 
     def with_x(self, x: int) -> 'Rect':
         newRect = copy(self)
         newRect.x = x
-        return copy 
+        return newRect
 
     def with_y(self, y: int) -> 'Rect':
         newRect = copy(self)
         newRect.y = y
-        return copy
+        return newRect
 
-    def with_pivot(self, pivot: 'Vec2') -> 'Rect':
+    def with_pivot(self, pivot: 'Vec2Int') -> 'Rect':
         newRect = copy(self)
         newRect.x = pivot.x - self.width // 2
         newRect.y = pivot.y - self.height // 2
@@ -184,7 +188,7 @@ class Rect(Serializable):
         newRect.height = height
         return newRect
 
-    def with_size(self, size: 'Vec2') -> 'Rect':
+    def with_size(self, size: 'Vec2Int') -> 'Rect':
         newRect = copy(self)
         newRect.width = size.x
         newRect.height = size.y
@@ -220,7 +224,7 @@ class Rect(Serializable):
         newRect.height += amount * 2
         return newRect
 
-    def moveRel(self, movementVec: Vec2):
+    def moveRel(self, movementVec: Vec2Int):
         newRect = copy(self)
         newRect.x += movementVec.x
         newRect.y += movementVec.y
@@ -236,13 +240,13 @@ class Rect(Serializable):
         newRect.y += amount
         return newRect
 
-    def moveAbs(self, newPivot: Vec2):
+    def moveAbs(self, newPivot: Vec2Int):
         newRect = copy(self)
         newRect.x = newPivot.x 
         newRect.y = newPivot.y
         return newRect
 
-    def __contains__(self, Vec2: Vec2) -> bool:
+    def __contains__(self, Vec2: Vec2Int) -> bool:
         return (self.x <= Vec2.x < self.x + self.width and
                 self.y <= Vec2.y < self.y + self.height)
 
@@ -254,6 +258,9 @@ class Rect(Serializable):
     @classmethod
     def from_bbox(cls, bbox: tuple):
         return cls(bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1])
+
+    def copy(self):
+        return copy(self)
 
     def cut_image(self, img: np.ndarray) -> np.ndarray:
         sx, sy, w, h = self.x, self.y, self.width, self.height
