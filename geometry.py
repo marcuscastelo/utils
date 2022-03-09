@@ -258,7 +258,7 @@ class Rect(Serializable):
         newRect.x = int(self.x * scaleX)
         newRect.y = int(self.y * scaleY)
         newRect.width = int(self.width * scaleX)
-        newRect.height = int(self.height * scaleY)ß
+        newRect.height = int(self.height * scaleY)
         #TODO: make RectInt, RectFloat, etc.
 
         return newRect
