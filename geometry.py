@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Union
 
 import bot_base.util.colors as colors
 from bot_base.util.serialization import Serializable
@@ -244,6 +244,23 @@ class Rect(Serializable):
         newRect = copy(self)
         newRect.x = newPivot.x 
         newRect.y = newPivot.y
+        return newRect
+
+    def scaled(self, scale: Union[Tuple[float, float], float]) -> 'Rect':
+        if isinstance(scale, tuple):
+            scaleX, scaleY = scale
+        elif isinstance(scale, float):
+            scaleX, scaleY = scale, scale
+        else:
+            raise TypeError(f'Expected float or tuple, got {type(scale)}')
+
+        newRect = copy(self)
+        newRect.x = int(self.x * scaleX)
+        newRect.y = int(self.y * scaleY)
+        newRect.width = int(self.width * scaleX)
+        newRect.height = int(self.height * scaleY)ß
+        #TODO: make RectInt, RectFloat, etc.
+
         return newRect
 
     def __contains__(self, Vec2: Vec2Int) -> bool:
