@@ -1,2 +1,2 @@
-include dpgext/*.png
-include dpgext/*.jpg
+include utils/*.png
+include utils/*.jpg
