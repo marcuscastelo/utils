@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Tuple, Union
 
-import bot_base.util.colors as colors
-from bot_base.util.serialization import Serializable
+import utils.colors as colors
+from utils.serialization import Serializable
 
 from copy import copy
 
