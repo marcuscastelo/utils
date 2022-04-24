@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Union
+from typing import Tuple, Union, overload
 
 import utils.colors as colors
 from utils.serialization import Serializable
@@ -8,83 +8,266 @@ from copy import copy
 
 import numpy as np
 
-@dataclass
-class Vec2Int:
-    x: int
-    y: int
+ArrayLike = Union[list[float], tuple[float], np.ndarray]
+Number = Union[int, float]
 
-    def norm_sq(self):
-        return self.x ** 2 + self.y ** 2
-    
-    def norm(self):
-        return (self.x ** 2 + self.y ** 2) ** 0.5
 
-    def proj_x(self):
-        return Vec2Int(self.x, 0)
-    
-    def proj_y(self):
-        return Vec2Int(0, self.y)
-
-    def with_x(self, x):
-        return Vec2Int(x, self.y)
-
-    def with_y(self, y):
-        return Vec2Int(self.x, y)
-
-    def __add__(self, other: 'Vec2Int') -> 'Vec2Int':
-        return Vec2Int(self.x + other.x, self.y + other.y)
-
-    def __sub__(self, other: 'Vec2Int') -> 'Vec2Int':
-        return Vec2Int(self.x - other.x, self.y - other.y)
-
-    def __mul__(self, other: int) -> 'Vec2Int':
-        return Vec2Int(self.x * other, self.y * other)
-
-    def __truediv__(self, other: int) -> 'Vec2Int':
-        return Vec2Int(self.x // other, self.y // other)
-
-    def __floordiv__(self, other : int) -> 'Vec2Int':
-        return Vec2Int(self.x // other, self.y // other)
-
-    def __mod__(self, other) -> 'Vec2Int':
-        return Vec2Int(self.x % other, self.y % other)
-
-    def __neg__(self) -> 'Vec2Int':
-        return Vec2Int(-self.x, -self.y)
-
-    def __ne__(self, o: object) -> bool:
-        if not isinstance(o, Vec2Int):
-            return True
-        return self.x != o.x or self.y != o.y
-    
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Vec2Int):
-            return False
-        return self.x == o.x and self.y == o.y
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-    def __repr__(self):
-        return f'Vec2({self.x}, {self.y})'
-
-    def __iter__(self):
-        yield from (self.x, self.y)
-
-    def __getitem__(self, item):
-        return (self.x, self.y)[item]
-
-    def __setitem__(self, key, value):
-        if key == 0:
-            self.x = value
-        elif key == 1:
-            self.y = value
+class VecN:
+    @overload
+    def __init__(self, element1: Number, *elements: Number): ...
+    @overload
+    def __init__(self, values: ArrayLike): ...
+    def __init__(self, element1: Union[ArrayLike, Number], *elements: Number):
+        element1_is_list_like = isinstance(element1, (list, tuple, np.ndarray, VecN))
+        if element1_is_list_like:
+            assert len(elements) == 0, 'If you pass a list, you must not pass any other arguments'
+            self.values = np.array(element1, dtype=float)
         else:
-            raise IndexError
+            self.values = np.array([element1] + list(elements), dtype=float)
+            return
+
+        self.values.repeat
+        unsupported_types = {type(value) for value in self.values if not isinstance(value, (float, int))}
+        if unsupported_types:
+            raise TypeError(f'The following types are not supported: {unsupported_types}')
+    
+
+    def projected(self, axis: Union['VecN', int]) -> float:
+        if isinstance(axis, int):
+            index = axis
+            axis = VecN([0] * len(self.values))
+            axis[index] = self.values[index]
+
+        return np.dot(self.values, axis.values)
+
+    def with_value(self, index: int, value: Number) -> 'VecN':
+        new_vec = copy(self)
+        new_vec[index] = value
+        return new_vec
+
+    def magnitude(self) -> float:
+        return self.values.dot(self.values) ** 0.5
+
+    def normalized(self) -> 'VecN':
+        return self / self.magnitude()
+
+    def __len__(self) -> int:
+        return len(self.values)
+
+    def __iter__(self) -> np.ndarray:
+        return iter(self.values)
+
+    def __repr__(self) -> str:
+        return f'VecN({self.values})'
+
+    def __str__(self) -> str:
+        return f'VecN({self.values})'
+
+    def __eq__(self, other: 'VecN') -> bool:
+        return np.all(self.values == other.values)
+
+    def __ne__(self, other: 'VecN') -> bool:
+        return not self.__eq__(other)
+
+    def __add__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(other, (Number, tuple, list, np.ndarray)):
+            other = VecN(other)
+        return VecN(self.values + other.values)
+
+    def __sub__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(other, (Number, tuple, list, np.ndarray)):
+            other = VecN(other)
+        return VecN(self.values - other.values)
+    
+    def __mul__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(other, (Number, tuple, list, np.ndarray)):
+            other = VecN(other)
+        return VecN(self.values * other.values)
+
+    def __truediv__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(other, (tuple, list, np.ndarray)):
+            other = VecN(other)
+        return VecN(self.values / other.values)
+
+    def __neg__(self) -> 'VecN':
+        return VecN(-self.values)
+
+    def __abs__(self) -> 'VecN':
+        return VecN(abs(self.values))
+
+    def __pow__(self, power: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(power, (tuple, list, np.ndarray)):
+            power = VecN(power)
+        return VecN(self.values ** power.values)
+
+    def __rpow__(self, power: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
+        if isinstance(power, (tuple, list, np.ndarray)):
+            power = VecN(power)
+        return VecN(power.values ** self.values)
+
+    def __getstate__(self) -> dict:
+        return {'values': self.values.tolist()}
+
+    def __setstate__(self, state: dict) -> None:
+        self.values = np.array(state['values'])
+
+    def __copy__(self) -> 'VecN':
+        return VecN(self.values)
+
+    def __deepcopy__(self, memo: dict) -> 'VecN':
+        return VecN(copy(self.values))
+
+    def __getitem__(self, index: Union[int, slice]) -> Union['VecN', float]:
+        if isinstance(index, int):
+            return self.values[index]
+        return VecN(self.values[index])
+
+    def __setitem__(self, index: Union[int, slice], value: Union['VecN', float, list, tuple, np.ndarray]) -> None:
+        if isinstance(value, (float, int, tuple, list, np.ndarray)):
+            if isinstance(value, (tuple, list)):
+                value = np.ndarray(value)
+            elif isinstance(value, VecN):
+                value = value.values
+            elif isinstance(value, (float, int)):
+                value = np.array([value])
+            self.values[index] = value
+        else:
+            raise TypeError(f'{type(value)} is not supported')
+    
 
 
-    def __len__(self):
-        return 2
+class Vec2(VecN):
+
+    @overload
+    def __init__(self, x: Number, y: Number):...
+    @overload
+    def __init__(self, values: tuple[Number, Number]):...
+    @overload
+    def __init__(self, values: Union[list[Number], tuple[Number], np.ndarray]):...
+    def __init__(self, arg1, *args):
+        if isinstance(arg1, (tuple, list, np.ndarray)):
+            if len(arg1) != 2:
+                raise ValueError(f'Vec2 can only be initialized with 2 values, got {len(arg1)}')
+            super().__init__(arg1)
+        elif isinstance(arg1, (float, int)):
+            if len(args) != 1:
+                raise ValueError(f'Vec2 can only be initialized with 2 values, got {len(args) + 1}')
+            super().__init__(arg1, *args)
+        else:
+            raise TypeError(f'{type(arg1)} is not supported')
+    @property
+    def x(self) -> float:
+        return self.values[0]
+    
+    @x.setter
+    def x(self, value: float) -> None:
+        self.values[0] = value
+    
+    @property
+    def y(self) -> float:
+        return self.values[1]
+    
+    @y.setter
+    def y(self, value: float) -> None:
+        self.values[1] = value
+    
+    def projected_x(self) -> float:
+        return self.projected(0)
+    
+    def projected_y(self) -> float:
+        return self.projected(1)
+
+    def __repr__(self) -> str:
+        return f'Vec2({self.values[0]}, {self.values[1]})'
+
+    def __str__(self) -> str:
+        return f'Vec2({self.values[0]}, {self.values[1]})'
+
+class Vec3(VecN):
+    @overload
+    def __init__(self, x: Number, y: Number, z: Number):...
+    @overload
+    def __init__(self, values: tuple[Number, Number, Number]):...
+    @overload
+    def __init__(self, values: Union[list[Number], tuple[Number], np.ndarray]):...
+    def __init__(self, arg1, *args):
+        if isinstance(arg1, (tuple, list, np.ndarray)):
+            if len(arg1) != 3:
+                raise ValueError(f'Vec3 can only be initialized with 3 values, got {len(arg1)}')
+            super().__init__(arg1)
+        elif isinstance(arg1, (float, int)):
+            if len(args) != 2:
+                raise ValueError(f'Vec3 can only be initialized with 3 values, got {len(args) + 1}')
+            super().__init__(arg1, *args)
+        else:
+            raise TypeError(f'{type(arg1)} is not supported')
+    @property
+    def x(self) -> float:
+        return self.values[0]
+    
+    @x.setter
+    def x(self, value: float) -> None:
+        self.values[0] = value
+    
+    @property
+    def y(self) -> float:
+        return self.values[1]
+    
+    @y.setter
+    def y(self, value: float) -> None:
+        self.values[1] = value
+    
+    @property
+    def z(self) -> float:
+        return self.values[2]
+    
+    @z.setter
+    def z(self, value: float) -> None:
+        self.values[2] = value
+    
+    @property
+    def xy(self) -> Vec2:
+        return Vec2(self.values[0], self.values[1])
+
+    @xy.setter
+    def xy(self, value: Vec2) -> None:
+        self.values[0] = value.x
+        self.values[1] = value.y
+
+    @property
+    def xz(self) -> Vec2:
+        return Vec2(self.values[0], self.values[2])
+
+    @xz.setter
+    def xz(self, value: Vec2) -> None:
+        self.values[0] = value.x
+        self.values[2] = value.y
+
+    @property
+    def yz(self) -> Vec2:
+        return Vec2(self.values[1], self.values[2])
+
+    @yz.setter
+    def yz(self, value: Vec2) -> None:
+        self.values[1] = value.x
+        self.values[2] = value.y
+
+    def projected_x(self) -> float:
+        return self.projected(0)
+    
+    def projected_y(self) -> float:
+        return self.projected(1)
+    
+    def projected_z(self) -> float:
+        return self.projected(2)
+
+    def __repr__(self) -> str:
+        return f'Vec3({self.values[0]}, {self.values[1]}, {self.values[2]})'
+
+    def __str__(self) -> str:
+        return f'Vec3({self.values[0]}, {self.values[1]}, {self.values[2]})'
+
+    
 
 @dataclass
 class Rect(Serializable):
@@ -121,46 +304,46 @@ class Rect(Serializable):
         else:
             raise IndexError
 
-    def __add__(self, vec: 'Vec2Int') -> 'Rect':
-        assert isinstance(vec, Vec2Int)
+    def __add__(self, vec: 'Vec2') -> 'Rect':
+        assert isinstance(vec, Vec2)
         newRect = copy(self)
         newRect.x += vec.x
         newRect.y += vec.y
         return newRect
 
-    def __sub__(self, vec: 'Vec2Int') -> 'Rect':
-        assert isinstance(vec, Vec2Int)
+    def __sub__(self, vec: 'Vec2') -> 'Rect':
+        assert isinstance(vec, Vec2)
         newRect = copy(self)
         newRect.x -= vec.x
         newRect.y -= vec.y
         return newRect
 
-    def center(self) -> 'Vec2Int':
-        return Vec2Int(self.x + self.width // 2, self.y + self.height // 2)
+    def center(self) -> 'Vec2':
+        return Vec2(self.x + self.width // 2, self.y + self.height // 2)
 
-    def pivot(self) -> 'Vec2Int':
-        return Vec2Int(self.x, self.y)
+    def pivot(self) -> 'Vec2':
+        return Vec2(self.x, self.y)
 
-    def size(self) -> 'Vec2Int':
-        return Vec2Int(self.width, self.height)
+    def size(self) -> 'Vec2':
+        return Vec2(self.width, self.height)
     
     def to_bbox(self) -> tuple:
         return (self.x, self.y, self.width + self.x, self.height + self.y)
 
-    def to_double_point(self) -> Tuple[Vec2Int, Vec2Int]:
+    def to_double_point(self) -> Tuple[Vec2, Vec2]:
         return (self.top_left(), self.bottom_right())
 
-    def top_left(self) -> Vec2Int:
-        return Vec2Int(self.x, self.y)
+    def top_left(self) -> Vec2:
+        return Vec2(self.x, self.y)
 
-    def top_right(self) -> Vec2Int:
-        return Vec2Int(self.x + self.width, self.y)
+    def top_right(self) -> Vec2:
+        return Vec2(self.x + self.width, self.y)
 
-    def bottom_left(self) -> Vec2Int:
-        return Vec2Int(self.x, self.y + self.height)
+    def bottom_left(self) -> Vec2:
+        return Vec2(self.x, self.y + self.height)
 
-    def bottom_right(self) -> Vec2Int:
-        return Vec2Int(self.x + self.width, self.y + self.height)
+    def bottom_right(self) -> Vec2:
+        return Vec2(self.x + self.width, self.y + self.height)
 
     def with_x(self, x: int) -> 'Rect':
         newRect = copy(self)
@@ -172,7 +355,7 @@ class Rect(Serializable):
         newRect.y = y
         return newRect
 
-    def with_pivot(self, pivot: 'Vec2Int') -> 'Rect':
+    def with_pivot(self, pivot: 'Vec2') -> 'Rect':
         newRect = copy(self)
         newRect.x = pivot.x - self.width // 2
         newRect.y = pivot.y - self.height // 2
@@ -188,7 +371,7 @@ class Rect(Serializable):
         newRect.height = height
         return newRect
 
-    def with_size(self, size: 'Vec2Int') -> 'Rect':
+    def with_size(self, size: 'Vec2') -> 'Rect':
         newRect = copy(self)
         newRect.width = size.x
         newRect.height = size.y
@@ -224,7 +407,7 @@ class Rect(Serializable):
         newRect.height += amount * 2
         return newRect
 
-    def moveRel(self, movementVec: Vec2Int):
+    def moveRel(self, movementVec: Vec2):
         newRect = copy(self)
         newRect.x += movementVec.x
         newRect.y += movementVec.y
@@ -240,7 +423,7 @@ class Rect(Serializable):
         newRect.y += amount
         return newRect
 
-    def moveAbs(self, newPivot: Vec2Int):
+    def moveAbs(self, newPivot: Vec2):
         newRect = copy(self)
         newRect.x = newPivot.x 
         newRect.y = newPivot.y
@@ -263,7 +446,7 @@ class Rect(Serializable):
 
         return newRect
 
-    def __contains__(self, Vec2: Vec2Int) -> bool:
+    def __contains__(self, Vec2: Vec2) -> bool:
         return (self.x <= Vec2.x < self.x + self.width and
                 self.y <= Vec2.y < self.y + self.height)
 
