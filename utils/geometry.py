@@ -661,7 +661,15 @@ class Rect2(Serializable):
     def expanded_end(self, size: Vec2) -> 'Rect2':
         return Rect2(self.start, self.end + size)
 
+    @overload
     def expanded(self, size: Vec2) -> 'Rect2':
+        ...
+    @overload
+    def expanded(self, size: Number) -> 'Rect2':
+        ...
+    def expanded(self, size: Union[Vec2, float, int]) -> 'Rect2':
+        if isinstance(size, (int, float)):
+            size = Vec2(size, size)
         return Rect2(self.start - size/2, self.end + size/2)
 
     def expanded_left(self, size: float) -> 'Rect2':
