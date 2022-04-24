@@ -64,23 +64,26 @@ class VecN:
         return f'VecN({self.values})'
 
     def __eq__(self, other: 'VecN') -> bool:
-        return np.all(self.values == other.values)
+        if isinstance(other, (VecN, int, float, tuple, list, np.ndarray)):
+            return np.all(self.values == other)
+        else:
+            return False
 
     def __ne__(self, other: 'VecN') -> bool:
         return not self.__eq__(other)
 
     def __add__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
-        if isinstance(other, (Number, tuple, list, np.ndarray)):
+        if isinstance(other, (int, float, tuple, list, np.ndarray)):
             other = VecN(other)
         return VecN(self.values + other.values)
 
     def __sub__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
-        if isinstance(other, (Number, tuple, list, np.ndarray)):
+        if isinstance(other, (int, float, tuple, list, np.ndarray)):
             other = VecN(other)
         return VecN(self.values - other.values)
     
     def __mul__(self, other: Union['VecN', Number, tuple, list, np.ndarray]) -> 'VecN':
-        if isinstance(other, (Number, tuple, list, np.ndarray)):
+        if isinstance(other, (int, float, tuple, list, np.ndarray)):
             other = VecN(other)
         return VecN(self.values * other.values)
 
@@ -122,6 +125,9 @@ class VecN:
             return self.values[index]
         return VecN(self.values[index])
 
+    def keys(self) -> list[int]:
+        return list(range(len(self)))
+
     def __setitem__(self, index: Union[int, slice], value: Union['VecN', float, list, tuple, np.ndarray]) -> None:
         if isinstance(value, (float, int, tuple, list, np.ndarray)):
             if isinstance(value, (tuple, list)):
@@ -144,8 +150,14 @@ class Vec2(VecN):
     def __init__(self, values: tuple[Number, Number]):...
     @overload
     def __init__(self, values: Union[list[Number], tuple[Number], np.ndarray]):...
+    @overload
+    def __init__(self, vec: VecN):...
     def __init__(self, arg1, *args):
-        if isinstance(arg1, (tuple, list, np.ndarray)):
+        if isinstance(arg1, VecN):
+            assert len(arg1) == 2, 'Vec2 can only be initialized with a VecN with 2 elements'
+            assert len(args) == 0, 'If you pass a VecN, you must not pass any other arguments'
+            super().__init__(arg1.values)
+        elif isinstance(arg1, (tuple, list, np.ndarray)):
             if len(arg1) != 2:
                 raise ValueError(f'Vec2 can only be initialized with 2 values, got {len(arg1)}')
             super().__init__(arg1)
@@ -170,6 +182,14 @@ class Vec2(VecN):
     @y.setter
     def y(self, value: float) -> None:
         self.values[1] = value
+
+    @property
+    def xy(self) -> 'Vec2':
+        return Vec2(self.values)
+    
+    @xy.setter
+    def xy(self, value: 'Vec2') -> None:
+        self.x, self.y = value.values
     
     def projected_x(self) -> float:
         return self.projected(0)
@@ -190,8 +210,14 @@ class Vec3(VecN):
     def __init__(self, values: tuple[Number, Number, Number]):...
     @overload
     def __init__(self, values: Union[list[Number], tuple[Number], np.ndarray]):...
+    @overload
+    def __init__(self, other: 'Vec3'):...
     def __init__(self, arg1, *args):
-        if isinstance(arg1, (tuple, list, np.ndarray)):
+        if isinstance(arg1, VecN):
+            assert len(args) == 0, 'Copy constructor can only be used with no additional arguments'
+            assert len(arg1) == 3, 'Vec3 copy constructor can only be initialized with a VecN with 3 elements (or Vec3)'
+            super().__init__(arg1.values)
+        elif isinstance(arg1, (tuple, list, np.ndarray)):
             if len(arg1) != 3:
                 raise ValueError(f'Vec3 can only be initialized with 3 values, got {len(arg1)}')
             super().__init__(arg1)
@@ -231,8 +257,7 @@ class Vec3(VecN):
 
     @xy.setter
     def xy(self, value: Vec2) -> None:
-        self.values[0] = value.x
-        self.values[1] = value.y
+        self.x, self.y = value
 
     @property
     def xz(self) -> Vec2:
@@ -251,6 +276,14 @@ class Vec3(VecN):
     def yz(self, value: Vec2) -> None:
         self.values[1] = value.x
         self.values[2] = value.y
+
+    @property
+    def xyz(self) -> 'Vec3':
+        return Vec3(self.values)
+    
+    @xyz.setter
+    def xyz(self, value: 'Vec3') -> None:
+        self.x, self.y, self.z = value.values
 
     def projected_x(self) -> float:
         return self.projected(0)
