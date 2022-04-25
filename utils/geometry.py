@@ -745,12 +745,15 @@ class Rect(Serializable):
         newRect.y -= vec.y
         return newRect
 
+    @property
     def center(self) -> 'Vec2':
         return Vec2(self.x + self.width // 2, self.y + self.height // 2)
 
+    @property
     def pivot(self) -> 'Vec2':
         return Vec2(self.x, self.y)
-
+        
+    @property
     def size(self) -> 'Vec2':
         return Vec2(self.width, self.height)
     
@@ -760,15 +763,19 @@ class Rect(Serializable):
     def to_double_point(self) -> Tuple[Vec2, Vec2]:
         return (self.top_left(), self.bottom_right())
 
+    @property
     def top_left(self) -> Vec2:
         return Vec2(self.x, self.y)
 
+    @property
     def top_right(self) -> Vec2:
         return Vec2(self.x + self.width, self.y)
 
+    @property
     def bottom_left(self) -> Vec2:
         return Vec2(self.x, self.y + self.height)
 
+    @property
     def bottom_right(self) -> Vec2:
         return Vec2(self.x + self.width, self.y + self.height)
 
