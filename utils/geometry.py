@@ -320,10 +320,10 @@ class Vec3(VecN):
         return self.projected(2)
 
     def __repr__(self) -> str:
-        return f'Vec3({self.values[0]}, {self.values[1]}, {self.values[2]})'
+        return f'Vec3({self.values[0]:.4f}, {self.values[1]:.4f}, {self.values[2]:.4f})'
 
     def __str__(self) -> str:
-        return f'Vec3({self.values[0]}, {self.values[1]}, {self.values[2]})'
+        return f'Vec3({self.values[0]:.4f}, {self.values[1]:.4f}, {self.values[2]:.4f})'
 
 #   assert Rect2(Vec2(0, 0), Vec2(1, 1)) == Rect2(Vec2(0, 0), Vec2(1, 1))
 #     assert Rect2(Vec2(0, 0), Vec2(1, 1)) != Rect2(Vec2(0, 0), Vec2(1, 2))
