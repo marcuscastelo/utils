@@ -673,16 +673,16 @@ class Rect2(Serializable):
         return Rect2(self.start - size/2, self.end + size/2)
 
     def expanded_left(self, size: float) -> 'Rect2':
-        return Rect2(self.start.x - size, self.end.x)
+        return Rect2(self.start - Vec2(size,0), self.end)
     
     def expanded_right(self, size: float) -> 'Rect2':
-        return Rect2(self.start.x, self.end.x + size)
+        return Rect2(self.start, self.end + Vec2(size,0))
 
     def expanded_top(self, size: float) -> 'Rect2':
-        return Rect2(self.start.y, self.end.y + size)
+        return Rect2(self.start, self.end + Vec2(0,size))
 
     def expanded_bottom(self, size: float) -> 'Rect2':
-        return Rect2(self.start.y - size, self.end.y)
+        return Rect2(self.start - Vec2(0,size), self.end)
 
     def expanded_top_left(self, size: Vec2) -> 'Rect2':
         return Rect2(self.start.xy - size, self.end.xy)
