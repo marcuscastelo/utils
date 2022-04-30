@@ -8,6 +8,7 @@ R = TypeVar('R')
 T = TypeVar('T')
 
 def funcsig(target: Callable[P, R]) -> Callable[...,Callable[P, R]]:
+    '''Decorator to add copy of the signature of the target function to the wrapper'''
     def inner(wrapper: Callable[..., Any]) -> Callable[P, R]:
         if inspect.ismethod(wrapper):
             wrapper = wrapper.__func__
@@ -16,6 +17,7 @@ def funcsig(target: Callable[P, R]) -> Callable[...,Callable[P, R]]:
 
 
 def metsig(target: Callable[P, R]) -> Callable[..., Callable[Concatenate[T, P], R]]:
+    '''Decorator to add copy of the signature of the target method (class function) to the wrapper'''
     def inner(wrapper: Callable[..., Any]) -> Callable[Concatenate[T, P], R]:
         if inspect.ismethod(wrapper):
             wrapper = wrapper.__func__
