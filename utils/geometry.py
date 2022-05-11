@@ -697,7 +697,7 @@ class Rect2(Serializable):
         return Rect2(self.start.xy, self.end.xy + size)
 
 @dataclass
-class Rect(Serializable):
+class DEPRECATED_RECT(Serializable):
     x: int
     y: int
     width: int
@@ -731,14 +731,14 @@ class Rect(Serializable):
         else:
             raise IndexError
 
-    def __add__(self, vec: 'Vec2') -> 'Rect':
+    def __add__(self, vec: 'Vec2') -> 'DEPRECATED_RECT':
         assert isinstance(vec, Vec2)
         newRect = copy(self)
         newRect.x += vec.x
         newRect.y += vec.y
         return newRect
 
-    def __sub__(self, vec: 'Vec2') -> 'Rect':
+    def __sub__(self, vec: 'Vec2') -> 'DEPRECATED_RECT':
         assert isinstance(vec, Vec2)
         newRect = copy(self)
         newRect.x -= vec.x
@@ -779,33 +779,33 @@ class Rect(Serializable):
     def bottom_right(self) -> Vec2:
         return Vec2(self.x + self.width, self.y + self.height)
 
-    def with_x(self, x: int) -> 'Rect':
+    def with_x(self, x: int) -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.x = x
         return newRect
 
-    def with_y(self, y: int) -> 'Rect':
+    def with_y(self, y: int) -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.y = y
         return newRect
 
-    def with_pivot(self, pivot: 'Vec2') -> 'Rect':
+    def with_pivot(self, pivot: 'Vec2') -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.x = pivot.x - self.width // 2
         newRect.y = pivot.y - self.height // 2
         return newRect
 
-    def with_width(self, width: int) -> 'Rect':
+    def with_width(self, width: int) -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.width = width
         return newRect
 
-    def with_height(self, height: int) -> 'Rect':
+    def with_height(self, height: int) -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.height = height
         return newRect
 
-    def with_size(self, size: 'Vec2') -> 'Rect':
+    def with_size(self, size: 'Vec2') -> 'DEPRECATED_RECT':
         newRect = copy(self)
         newRect.width = size.x
         newRect.height = size.y
@@ -863,7 +863,7 @@ class Rect(Serializable):
         newRect.y = newPivot.y
         return newRect
 
-    def scaled(self, scale: Union[Tuple[float, float], float]) -> 'Rect':
+    def scaled(self, scale: Union[Tuple[float, float], float]) -> 'DEPRECATED_RECT':
         if isinstance(scale, tuple):
             scaleX, scaleY = scale
         elif isinstance(scale, float):
@@ -885,7 +885,7 @@ class Rect(Serializable):
                 self.y <= Vec2.y < self.y + self.height)
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Rect):
+        if not isinstance(o, DEPRECATED_RECT):
             return False
         return self.x == o.x and self.y == o.y and self.width == o.width and self.height == o.height
 
@@ -902,7 +902,7 @@ class Rect(Serializable):
         return img[sy:ey, sx:ex]
 
 @dataclass
-class GRect(Rect):
+class GRect(DEPRECATED_RECT):
     color: tuple = colors.pink # BGRA
     filled: bool = False
     visible: bool = True
