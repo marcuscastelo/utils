@@ -84,19 +84,31 @@ class VecN:
             other = self.__class__(other)
         return self.__class__(self.values + other.values)
 
+    def __iadd__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__add__(other)).values
+        return self
+
     def __sub__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         if isinstance(other, (float, int)):
             other = [other] * len(self)
         if isinstance(other, (tuple, list, np.ndarray)):
             other = self.__class__(other)
         return self.__class__(self.values - other.values)
-    
+
+    def __isub__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__sub__(other)).values
+        return self
+
     def __mul__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         if isinstance(other, (float, int)):
             other = [other] * len(self)
         if isinstance(other, (tuple, list, np.ndarray)):
             other = self.__class__(other)
         return self.__class__(self.values * other.values)
+
+    def __imul__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__mul__(other)).values
+        return self
 
     def __truediv__(self, other: Union[Self, Number, Self, tuple, list, np.ndarray]) -> Self:
         if isinstance(other, (VecN)):
@@ -105,12 +117,20 @@ class VecN:
             other = self.__class__(other)
         return self.__class__(self.values / other)
 
+    def __itruediv__(self, other: Union[Self, Number, Self, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__truediv__(other)).values
+        return self
+
     def __floordiv__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         if isinstance(other, (VecN)):
             other = other.values
         if isinstance(other, (tuple, list, np.ndarray)):
             other = self.__class__(other)
         return self.__class__(self.values // other)
+
+    def __ifloordiv__(self, other: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__floordiv__(other)).values
+        return self
 
     def __neg__(self) -> Self:
         return self.__class__(-self.values)
@@ -127,6 +147,10 @@ class VecN:
         if isinstance(power, (tuple, list, np.ndarray)):
             power = self.__class__(power)
         return self.__class__(power.values ** self.values)
+
+    def __ipow__(self, power: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
+        self.values = (self.__pow__(power)).values
+        return self
 
     def __getstate__(self) -> dict:
         return {'values': self.values.tolist()}
