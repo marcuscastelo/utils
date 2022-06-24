@@ -51,9 +51,14 @@ class VecN:
     def magnitude(self) -> float:
         return self.values.dot(self.values) ** 0.5
 
-    def normalized(self) -> 'VecN':
+    def normalized(self) -> Self:
         return self / self.magnitude()
 
+    def dot(self, other: Self) -> float:
+        assert isinstance(other, VecN), f'Trying to make dot product with a {type(other)}'
+        assert len(other.values) == len(self.values), f'Vectors must be the same size for a dot product, got {len(other.values)=} != {len(self.values)=}'
+
+        return np.dot(self.values, other.values)
     def __len__(self) -> int:
         return len(self.values)
 
