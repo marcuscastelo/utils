@@ -145,13 +145,17 @@ class VecN:
 
     def __pow__(self, power: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         if isinstance(power, (tuple, list, np.ndarray)):
-            power = self.__class__(power)
-        return self.__class__(self.values ** power.values)
+            power_values = self.__class__(power).values
+        else:
+            power_values = power
+        return self.__class__(self.values ** power_values)
 
     def __rpow__(self, power: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         if isinstance(power, (tuple, list, np.ndarray)):
-            power = self.__class__(power)
-        return self.__class__(power.values ** self.values)
+            power_values = self.__class__(power)
+        else:
+            power_values = power
+        return self.__class__(power_values ** self.values)
 
     def __ipow__(self, power: Union[Self, Number, tuple, list, np.ndarray]) -> Self:
         self.values = (self.__pow__(power)).values
